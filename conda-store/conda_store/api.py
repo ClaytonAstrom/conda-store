@@ -17,7 +17,7 @@ class CondaStoreAPI:
         self, conda_store_url: str, auth_type: str = "none", verify_ssl=True, **kwargs
     ):
         self.conda_store_url = yarl.URL(conda_store_url)
-        self.api_url = self.conda_store_url / "api/v1"
+        self.api_url = self.conda_store_url / "api/v1" / ""
         self.auth_type = auth_type
         self.verify_ssl = verify_ssl
 
@@ -64,7 +64,7 @@ class CondaStoreAPI:
         return data
 
     async def get_permissions(self):
-        async with self.session.get(self.api_url / "permission") as response:
+        async with self.session.get(self.api_url / "permission" / "") as response:
             return (await response.json())["data"]
 
     async def create_token(
@@ -81,7 +81,7 @@ class CondaStoreAPI:
             "exp": expiration or current_permissions["expiration"],
         }
         async with self.session.post(
-            self.api_url / "token", json=requested_permissions
+            self.api_url / "token" / "", json=requested_permissions
         ) as response:
             if response.status == 400:
                 raise CondaStoreAPIError((await response.json())["message"])
@@ -89,24 +89,24 @@ class CondaStoreAPI:
             return (await response.json())["data"]["token"]
 
     async def list_namespaces(self):
-        return await self.get_paginated_request(self.api_url / "namespace")
+        return await self.get_paginated_request(self.api_url / "namespace" / "")
 
     async def create_namespace(self, namespace: str):
         async with self.session.post(
-            self.api_url / "namespace" / namespace
+            self.api_url / "namespace" / namespace / ""
         ) as response:
             if response.status != 200:
                 raise CondaStoreAPIError(f"Error creating namespace {namespace}")
 
     async def delete_namespace(self, namespace: str):
         async with self.session.delete(
-            self.api_url / "namespace" / namespace
+            self.api_url / "namespace" / namespace / ""
         ) as response:
             if response.status != 200:
                 raise CondaStoreAPIError(f"Error deleting namespace {namespace}")
 
     async def list_environments(self, status: str, artifact: str, packages: List[str]):
-        url = self.api_url / "environment"
+        url = self.api_url / "environment" / ""
         if status:
             url = url % {"status": status}
         if artifact:
@@ -117,7 +117,7 @@ class CondaStoreAPI:
 
     async def delete_environment(self, namespace: str, name: str):
         async with self.session.delete(
-            self.api_url / "environment" / namespace / name
+            self.api_url / "environment" / namespace / name / ""
         ) as response:
             if response.status != 200:
                 raise CondaStoreAPIError(
@@ -126,7 +126,7 @@ class CondaStoreAPI:
 
     async def create_environment(self, namespace: str, specification: str):
         async with self.session.post(
-            self.api_url / "specification",
+            self.api_url / "specification" / "",
             json={
                 "namespace": namespace,
                 "specification": specification,
@@ -143,7 +143,7 @@ class CondaStoreAPI:
 
     async def get_environment(self, namespace: str, name: str):
         async with self.session.get(
-            self.api_url / "environment" / namespace / name
+            self.api_url / "environment" / namespace / name / ""
         ) as response:
             if response.status != 200:
                 raise CondaStoreAPIError(
@@ -162,12 +162,12 @@ class CondaStoreAPI:
                 "channels": channels,
                 "conda": conda,
                 "pip": pip,
-            }
+            } / ""
         ) as response:
             return (await response.json())["solve"]
 
     async def list_builds(self, status: str, artifact: str, packages: List[str]):
-        url = self.api_url / "build"
+        url = self.api_url / "build" / ""
         if status:
             url = url % {"status": status}
         if artifact:
@@ -177,14 +177,14 @@ class CondaStoreAPI:
         return await self.get_paginated_request(url)
 
     async def get_build(self, build_id: int):
-        async with self.session.get(self.api_url / "build" / str(build_id)) as response:
+        async with self.session.get(self.api_url / "build" / str(build_id) / "") as response:
             if response.status != 200:
                 raise CondaStoreAPIError(f"Error getting build {build_id}")
 
             return (await response.json())["data"]
 
     async def download(self, build_id: int, artifact: str) -> bytes:
-        url = self.api_url / "build" / str(build_id) / artifact
+        url = self.api_url / "build" / str(build_id) / artifact / ""
         async with self.session.get(url) as response:
             if response.status != 200:
                 raise CondaStoreAPIError(f"Error downloading build {build_id}")
