@@ -243,11 +243,17 @@ async def wait_environment(ctx, uri: str, timeout: int, interval: int, artifact:
     default=False,
     help="Disable caching builds for fast execution",
 )
+@click.option(
+    "--install-dir",
+    default=os.path.join(
+                tempfile.gettempdir(), "conda-store"
+            )
+)
 @click.argument("uri")
 @click.argument("command", nargs=-1)
 @click.pass_context
 @utils.coro
-async def run_environment(ctx, uri: str, no_cache: bool, command: str, artifact: str):
+async def run_environment(ctx, uri: str, no_cache: bool, command: str, artifact: str, install_dir: str):
     """Execute given environment specified as a URI with COMMAND
 
     URI in format '<build-id>', '<namespace>/<name>', '<namespace>/<name>:<build-id>'\n
@@ -264,7 +270,8 @@ async def run_environment(ctx, uri: str, no_cache: bool, command: str, artifact:
                 await runner.run_build(conda_store, tmpdir, build_id, command, artifact)
         else:
             directory = os.path.join(
-                tempfile.gettempdir(), "conda-store", str(build_id)
+                install_dir,
+                str(build_id)
             )
             os.makedirs(directory, exist_ok=True)
             await runner.run_build(conda_store, directory, build_id, command, artifact)
