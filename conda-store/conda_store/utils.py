@@ -101,7 +101,6 @@ def output_table(title: str, columns: Dict[str, str], rows: List[Dict]):
 
 def ensure_slash(*args):
     """Concatenate a series of stringable args, then append a trailing slash if there isn't one.
-
     This is to help reduce redirects, as that can cause the authorization token to be dropped between redirect
     """
     str_url = ""
