@@ -336,6 +336,13 @@ class CondaStore(LoggingConfigurable):
         config=True,
     )
 
+    post_pack_build_hook = Callable(
+        default_value=None,
+        help="Callable function for post conda-pack",
+        config=True,
+        allow_none=True,
+    )
+
     post_update_environment_build_hook = Callable(
         default_value=None,
         help="callable function taking conda_store and `orm.Environment` object as input arguments. This function can be used to add custom behavior that will run after an environment's current build changes.",

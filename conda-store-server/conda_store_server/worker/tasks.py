@@ -202,6 +202,9 @@ def task_build_conda_pack(self, build_id):
         build = api.get_build(db, build_id)
         build_conda_pack(db, conda_store, build)
 
+    if conda_store.post_pack_build_hook:
+        conda_store.post_pack_build_hook(conda_store, build)
+
 
 @shared_task(base=WorkerTask, name="task_build_conda_docker", bind=True)
 def task_build_conda_docker(self, build_id):
