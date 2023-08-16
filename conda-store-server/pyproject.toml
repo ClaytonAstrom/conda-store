@@ -28,6 +28,7 @@ classifiers = [
 dependencies = [
   "conda-docker",
   "conda-pack",
+  "conda-package-streaming",
   "celery",
   "sqlalchemy",
   "requests",
