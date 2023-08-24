@@ -198,18 +198,18 @@ def task_build_conda_env_export(self, build_id):
 @shared_task(base=WorkerTask, name="task_build_conda_pack", bind=True)
 def task_build_conda_pack(self, build_id):
     conda_store = self.worker.conda_store
-    conda_store.log.debug("I do actually do things, believe it or not")
+    self.worker.log.debug("I do actually do things, believe it or not")
     with conda_store.session_factory() as db:
         build = api.get_build(db, build_id)
         build_conda_pack(db, conda_store, build)
 
-    conda_store.log.debug("Checking for post_pack_build_hook...")
+    self.worker.log.debug("Checking for post_pack_build_hook...")
     if conda_store.post_pack_build_hook:
-        conda_store.log.debug("Attempting to run post_pack_build_hook...")
+        self.worker.log.debug("Attempting to run post_pack_build_hook...")
         try:
-            conda_store.post_pack_build_hook(conda_store, build)
-        except e:
-            conda_store.log.debug(f"Failed on {e}")
+            conda_store.post_pack_build_hook(conda_store, build, log=self.worker.log)
+        except Exception as e:
+            self.worker.log.debug(f"Failed on {e}")
 
 
 @shared_task(base=WorkerTask, name="task_build_conda_docker", bind=True)
