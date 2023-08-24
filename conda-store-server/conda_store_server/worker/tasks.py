@@ -202,8 +202,13 @@ def task_build_conda_pack(self, build_id):
         build = api.get_build(db, build_id)
         build_conda_pack(db, conda_store, build)
 
+    conda_store.log.info("Checking for post_pack_build_hook...")
     if conda_store.post_pack_build_hook:
-        conda_store.post_pack_build_hook(conda_store, build)
+        conda_store.log.info("Attempting to run post_pack_build_hook...")
+        try:
+            conda_store.post_pack_build_hook(conda_store, build)
+        except e:
+            conda_store.log.info(f"Failed on {e}")
 
 
 @shared_task(base=WorkerTask, name="task_build_conda_docker", bind=True)
