@@ -71,7 +71,7 @@ class CondaStoreWorker(Application):
     def start(self):
         argv = [
             "worker",
-            "--loglevel=INFO",
+            "--loglevel=DEBUG",
             "--beat",
         ]
 
