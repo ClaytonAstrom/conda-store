@@ -208,7 +208,7 @@ def task_build_conda_pack(self, build_id):
         conda_store.log.debug("Attempting to run post_pack_build_hook...")
         try:
             conda_store.post_pack_build_hook(conda_store, build)
-        except e:
+        except Exception as e:
             conda_store.log.debug(f"Failed on {e}")
 
 
