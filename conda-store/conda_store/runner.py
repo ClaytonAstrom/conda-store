@@ -28,6 +28,27 @@ async def run_build_archive(
     build_id: int,
     command: List[str],
 ):
+    activate = run_unpack_archive(
+        conda_store_api,
+        conda_prefix,
+        build_id
+    )
+
+    wrapped_command = [
+        "bash",
+        "-c",
+        ". '{}' '{}' && exec {}".format(
+            activate, conda_prefix, " ".join(shlex.quote(c) for c in command)
+        ),
+    ]
+    os.execvp(wrapped_command[0], wrapped_command)
+
+async def run_unpack_archive(
+        conda_store_api: api.CondaStoreAPI,
+        conda_prefix: str,
+        build_id: int,
+):
+    
     activate = os.path.join(conda_prefix, "bin", "activate")
     conda_unpack = os.path.join(conda_prefix, "bin", "conda-unpack")
 
@@ -39,12 +60,5 @@ async def run_build_archive(
 
         if os.path.exists(conda_unpack):
             subprocess.check_output(conda_unpack)
-
-    wrapped_command = [
-        "bash",
-        "-c",
-        ". '{}' '{}' && exec {}".format(
-            activate, conda_prefix, " ".join(shlex.quote(c) for c in command)
-        ),
-    ]
-    os.execvp(wrapped_command[0], wrapped_command)
+    
+    return activate

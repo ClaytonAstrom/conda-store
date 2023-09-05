@@ -270,6 +270,19 @@ async def run_environment(ctx, uri: str, no_cache: bool, command: str, artifact:
             await runner.run_build(conda_store, directory, build_id, command, artifact)
 
 
+@cli.command("unpack")
+@click.argument("uri")
+@click.argument("path")
+@click.pass_context
+@utils.coro
+async def unpack_archive(ctx, uri: str, path: str):
+    async with ctx.obj["CONDA_STORE_API"] as conda_store:
+        build_id = await parse_build(conda_store, uri)
+
+        directory = os.path.join(path)
+        await runner.run_unpack_archive(conda_store, directory, build_id)
+
+
 @cli.command("solve")
 @click.argument("filename", type=click.File("r"))
 @click.option(
