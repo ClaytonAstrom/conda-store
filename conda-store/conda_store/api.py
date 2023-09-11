@@ -110,7 +110,7 @@ class CondaStoreAPI:
                 raise CondaStoreAPIError(f"Error deleting namespace {namespace}")
 
     async def list_environments(self, status: str, artifact: str, packages: List[str]):
-        url = self.api_url / "environment"
+        url = utils.ensure_slash(self.api_url / "environment")
         if status:
             url = url % {"status": status}
         if artifact:
