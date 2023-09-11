@@ -243,11 +243,17 @@ async def wait_environment(ctx, uri: str, timeout: int, interval: int, artifact:
     default=False,
     help="Disable caching builds for fast execution",
 )
+@click.option(
+    "--persistent-path",
+    default=None,
+    type=str,
+    help="Path to check for persistent env before creating it in a temporary directory.  Ignored if --no-cache is enabled"
+)
 @click.argument("uri")
 @click.argument("command", nargs=-1)
 @click.pass_context
 @utils.coro
-async def run_environment(ctx, uri: str, no_cache: bool, command: str, artifact: str):
+async def run_environment(ctx, uri: str, no_cache: bool, command: str, artifact: str, persistent_path: str):
     """Execute given environment specified as a URI with COMMAND
 
     URI in format '<build-id>', '<namespace>/<name>', '<namespace>/<name>:<build-id>'\n
@@ -262,6 +268,8 @@ async def run_environment(ctx, uri: str, no_cache: bool, command: str, artifact:
         if no_cache:
             with tempfile.TemporaryDirectory() as tmpdir:
                 await runner.run_build(conda_store, tmpdir, build_id, command, artifact)
+        elif persistent_path and os.path.isfile(os.path.join(persistent_path, "bin", "activate")):
+            await runner.run_build(conda_store, persistent_path, build_id, command, artifact)
         else:
             directory = os.path.join(
                 tempfile.gettempdir(), "conda-store", str(build_id)
