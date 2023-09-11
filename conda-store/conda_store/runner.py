@@ -28,7 +28,7 @@ async def run_build_archive(
     build_id: int,
     command: List[str],
 ):
-    activate = run_unpack_archive(
+    activate = await run_unpack_archive(
         conda_store_api,
         conda_prefix,
         build_id
