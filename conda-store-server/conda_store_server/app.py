@@ -297,6 +297,13 @@ class CondaStore(LoggingConfigurable):
         config=True,
     )
 
+    post_pack_build_hook = Callable(
+        default_value=None,
+        help="Callable function for post conda-pack",
+        config=True,
+        allow_none=True,
+    )
+
     @property
     def session_factory(self):
         if hasattr(self, "_session_factory"):

@@ -112,6 +112,11 @@ def task_build_conda_docker(self, build_id):
     conda_store = self.worker.conda_store
     build = api.get_build(conda_store.db, build_id)
     build_conda_docker(conda_store, build)
+    if conda_store.post_pack_build_hook:
+        try:
+            conda_store.post_pack_build_hook(conda_store, build)
+        except Exception as e:
+            conda_store.log.debug(f"Failed on {e}")
 
 
 @current_app.task(base=WorkerTask, name="task_update_environment_build", bind=True)
