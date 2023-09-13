@@ -193,7 +193,7 @@ class CondaStoreAPI:
 
     async def download(self, build_id: int, artifact: str) -> bytes:
         url = self.api_url / "build" / str(build_id) / artifact
-        async with self.session.get(utils.esnure_slash(url)) as response:
+        async with self.session.get(utils.ensure_slash(url)) as response:
             if response.status != 200:
                 raise CondaStoreAPIError(f"Error downloading build {build_id}")
 
