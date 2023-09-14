@@ -110,14 +110,14 @@ class CondaStoreAPI:
                 raise CondaStoreAPIError(f"Error deleting namespace {namespace}")
 
     async def list_environments(self, status: str, artifact: str, packages: List[str]):
-        url = utils.ensure_slash(self.api_url / "environment")
+        url = self.api_url / "environment"
         if status:
             url = url % {"status": status}
         if artifact:
             url = url % {"artifact": artifact}
         if packages:
             url = url % {"packages": packages}
-        return await self.get_paginated_request(url)
+        return await self.get_paginated_request(utils.ensure_slash(url))
 
     async def delete_environment(self, namespace: str, name: str):
         async with self.session.delete(
@@ -180,7 +180,7 @@ class CondaStoreAPI:
             url = url % {"artifact": artifact}
         if packages:
             url = url % {"packages": packages}
-        return await self.get_paginated_request(url)
+        return await self.get_paginated_request(utils.ensure_slash(url))
 
     async def get_build(self, build_id: int):
         async with self.session.get(
