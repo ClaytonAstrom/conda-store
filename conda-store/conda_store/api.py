@@ -49,7 +49,7 @@ class CondaStoreAPI:
     async def get_paginated_request(self, url: yarl.URL, max_pages=None, **kwargs):
         data = []
 
-        async with self.session.get(utils.ensure_slash(url)) as response:
+        async with self.session.get(url) as response:
             response_data = await response.json()
             num_pages = math.ceil(response_data["count"] / response_data["size"])
             data.extend(response_data["data"])
@@ -59,7 +59,7 @@ class CondaStoreAPI:
 
         for page in range(2, num_pages + 1):
             async with self.session.get(
-                utils.ensure_slash(url % {"page": page})
+                url % {"page": page}
             ) as response:
                 data.extend((await response.json())["data"])
 
@@ -93,7 +93,7 @@ class CondaStoreAPI:
             return (await response.json())["data"]["token"]
 
     async def list_namespaces(self):
-        return await self.get_paginated_request(self.api_url / "namespace")
+        return await self.get_paginated_request(utils.ensure_slash(self.api_url / "namespace"))
 
     async def create_namespace(self, namespace: str):
         async with self.session.post(
@@ -110,14 +110,14 @@ class CondaStoreAPI:
                 raise CondaStoreAPIError(f"Error deleting namespace {namespace}")
 
     async def list_environments(self, status: str, artifact: str, packages: List[str]):
-        url = self.api_url / "environment"
+        url = yarl.URL(utils.ensure_slash(self.api_url / "environment"))
         if status:
             url = url % {"status": status}
         if artifact:
             url = url % {"artifact": artifact}
         if packages:
             url = url % {"packages": packages}
-        return await self.get_paginated_request(utils.ensure_slash(url))
+        return await self.get_paginated_request(url)
 
     async def delete_environment(self, namespace: str, name: str):
         async with self.session.delete(
@@ -160,27 +160,26 @@ class CondaStoreAPI:
         self, channels: List[str], conda: List[str], pip: List[str]
     ):
         async with self.session.get(
-            utils.ensure_slash(
+            yarl.URL(utils.ensure_slash(
                 self.api_url
-                / "specification"
+                / "specification"))
                 % {
                     "channels": channels,
                     "conda": conda,
                     "pip": pip,
                 }
-            )
         ) as response:
             return (await response.json())["solve"]
 
     async def list_builds(self, status: str, artifact: str, packages: List[str]):
-        url = self.api_url / "build"
+        url = yarl.URL(utils.ensure_slash(self.api_url / "build"))
         if status:
             url = url % {"status": status}
         if artifact:
             url = url % {"artifact": artifact}
         if packages:
             url = url % {"packages": packages}
-        return await self.get_paginated_request(utils.ensure_slash(url))
+        return await self.get_paginated_request(url)
 
     async def get_build(self, build_id: int):
         async with self.session.get(
