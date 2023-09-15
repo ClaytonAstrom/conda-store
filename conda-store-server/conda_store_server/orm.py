@@ -120,8 +120,8 @@ class Build(Base):
     environment_id = Column(Integer, ForeignKey("environment.id"), nullable=False)
     environment = relationship(
         "Environment",
-        back_populates="builds",
-        foreign_keys=[environment_id]
+        backref=backref("builds", cascade="all, delete-orphan"),
+        foreign_keys=[environment_id],
     )
 
     packages = relationship("CondaPackage", secondary=build_conda_package)
@@ -264,15 +264,6 @@ class Environment(Base):
 
     namespace_id = Column(Integer, ForeignKey("namespace.id"), nullable=False)
     namespace = relationship(Namespace)
-    builds = relationship(
-        "Build", 
-        back_populates='environment',
-        cascade="all, delete-orphan",
-    )
-
-    @hybrid_property
-    def build_ids(self):
-        return [build.id for build in self.builds]
 
     name = Column(Unicode(255), nullable=False)
 
@@ -284,6 +275,10 @@ class Environment(Base):
     deleted_on = Column(DateTime, default=None)
 
     description = Column(UnicodeText, default=None)
+
+    @hybrid_property
+    def build_ids(self):
+        return [build.id for build in self.builds]
 
 
 class CondaChannel(Base):
