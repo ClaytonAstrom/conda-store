@@ -278,7 +278,7 @@ class Environment(Base):
 
     @hybrid_property
     def completed_build_ids(self):
-        return [build.id for build in self.builds if build.status == schema.BuildStatus.COMPLETED]
+        return [build.id for build in self.builds if build.status == schema.BuildStatus.COMPLETED and build.has_conda_pack]
 
 
 class CondaChannel(Base):
