@@ -120,9 +120,9 @@ class Build(Base):
     environment_id = Column(Integer, ForeignKey("environment.id"), nullable=False)
     environment = relationship(
         "Environment",
-        backref=backref("builds", cascade="all, delete-orphan"),
-        foreign_keys=[environment_id],
-        lazy='select'
+        back_populates="builds",
+        cascade="all, delete-orphan",
+        foreign_keys=[environment_id]
     )
 
     packages = relationship("CondaPackage", secondary=build_conda_package)
@@ -265,6 +265,14 @@ class Environment(Base):
 
     namespace_id = Column(Integer, ForeignKey("namespace.id"), nullable=False)
     namespace = relationship(Namespace)
+    builds = relationship(
+        "Build", 
+        back_populates='environment'
+    )
+
+    @hybrid_property
+    def build_ids(self):
+        return [build.id for build in self.builds]
 
     name = Column(Unicode(255), nullable=False)
 
