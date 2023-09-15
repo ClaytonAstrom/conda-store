@@ -277,8 +277,8 @@ class Environment(Base):
     description = Column(UnicodeText, default=None)
 
     @hybrid_property
-    def build_ids(self):
-        return [build.id for build in self.builds]
+    def completed_build_ids(self):
+        return [build.id for build in self.builds if build.status == schema.BuildStatus.COMPLETED]
 
 
 class CondaChannel(Base):

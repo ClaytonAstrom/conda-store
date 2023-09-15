@@ -145,7 +145,7 @@ class Environment(BaseModel):
     name: str
     current_build_id: int
     current_build: Optional[Build]
-    build_ids: Optional[List[int]]
+    completed_build_ids: Optional[List[int]]
 
     description: Optional[str]
 
