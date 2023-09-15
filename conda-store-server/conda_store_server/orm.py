@@ -121,7 +121,6 @@ class Build(Base):
     environment = relationship(
         "Environment",
         back_populates="builds",
-        cascade="all, delete-orphan",
         foreign_keys=[environment_id]
     )
 
@@ -267,7 +266,8 @@ class Environment(Base):
     namespace = relationship(Namespace)
     builds = relationship(
         "Build", 
-        back_populates='environment'
+        back_populates='environment',
+        cascade="all, delete-orphan",
     )
 
     @hybrid_property
