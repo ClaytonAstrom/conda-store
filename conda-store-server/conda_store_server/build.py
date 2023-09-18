@@ -271,6 +271,10 @@ def build_conda_pack(conda_store, build):
             artifact_type=schema.BuildArtifactType.CONDA_PACK,
         )
 
+def clean_build(conda_store, build):
+    conda_prefix = build.build_path(conda_store)
+    conda_store.log.info(f"Cleaning {conda_prefix}")
+    os.rmdir(conda_prefix)
 
 def build_conda_docker(conda_store, build):
     from conda_docker.conda import (

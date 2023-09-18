@@ -13,6 +13,7 @@ from conda_store_server.build import (
     build_conda_environment,
     build_conda_env_export,
     build_conda_pack,
+    clean_build,
     build_conda_docker,
     solve_conda_environment,
 )
@@ -111,6 +112,12 @@ def task_build_conda_pack(self, build_id):
         except Exception as e:
             conda_store.log.debug(f"Failed on {e}")
 
+
+@current_app.task(base=WorkerTask, name="task_clean_build", bind=True)
+def task_clean_build(self, build_id):
+    conda_store = self.worker.conda_store
+    build = api.get_build(conda_store.db, build_id)
+    clean_build(conda_store, build)
 
 @current_app.task(base=WorkerTask, name="task_build_conda_docker", bind=True)
 def task_build_conda_docker(self, build_id):

@@ -542,6 +542,7 @@ class CondaStore(LoggingConfigurable):
             tasks.task_update_storage_metrics.si()
             | tasks.task_build_conda_environment.si(build.id)
             | group(*artifact_tasks)
+            | tasks.task_clean_build.si(build.id)
             | tasks.task_update_storage_metrics.si()
         ).apply_async()
 
